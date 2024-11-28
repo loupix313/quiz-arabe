@@ -1,0 +1,211 @@
+<!DOCTYPE html> 
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Arabe - IA et Algorithmes</title>
+  <style>
+    /* Style global */
+    body {
+      margin: 0;
+      font-family: 'Comic Sans MS', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column; /* Modification pour ajouter le footer */
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      background: url('C:/Users/I A T COMPUTERS LLC/Desktop/image.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    #quiz-container, #result-container, #loading-screen {
+      text-align: center;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.8); /* Amélioration de la lisibilité */
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      width: 90%;
+      max-width: 600px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+      width: 80%;
+      max-width: 400px;
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3a934c;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #loading-screen {
+      color: white;
+      font-size: 24px;
+      animation: fadeInOut 3s infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    /* Footer styles */
+    footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Écran de chargement -->
+  <div id="loading-screen" class="hidden">
+    Chargement en cours...
+  </div>
+
+  <!-- Quiz Container -->
+  <div id="quiz-container">
+    <h1>Quiz Arabe - IA et Algorithmes</h1>
+    <h2> الخوارزميات و الذكاء الاصطناعي </h2>
+    <p id="arabic-word"></p>
+    <input id="answer" type="text" placeholder="Tapez la réponse en français ici" onkeydown="handleEnter(event)">
+    <button onclick="checkAnswer()">Valider</button>
+  </div>
+
+  <!-- Résultat Container -->
+  <div id="result-container" class="hidden">
+    <h1 id="result-title"></h1>
+    <h2 id="result-title"></h2>
+    <p id="result-text"></p>
+    <button onclick="nextWord()">Suivant</button>
+    <button onclick="retryQuiz()">Ressayer le Quiz</button>
+  </div>
+
+  <footer>
+    <span> Lycée International Alexandre Dumas, Alger</span>
+    <span>Loubna Abdelouahab, 1.3 G  © </span>
+  </footer>
+
+  <script>
+    const words = [
+      { arabic: "الخوارزمية", french: "algorithme", summary: "Suite d'instructions pour résoudre un problème. Le mot 'algorithme' vient du nom du grand mathématicien Al-Khwarizmi (vers l'an 820), qui introduisit en Occident la numération décimale et enseigna les règles élémentaires des calculs s'y rapportant." },
+      { arabic: "ذكاء اصطناعي", french: "intelligence artificielle", summary: "Branche informatique simulant l'intelligence humaine. PS : l'image en arrière-plan est faite par l'intelligence artificielle (DALL-e)" },
+      { arabic: "حاسوب", french: "ordinateur", summary: "Machine électronique pour calculs et données." },
+      { arabic: "بيانات", french: "données", summary: "Informations collectées, souvent utilisées en informatique." },
+      { arabic: "تشفير", french: "cryptage", summary: "Processus de transformation des données pour les sécuriser." },
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+
+    // Initialiser le mot
+    document.getElementById("arabic-word").textContent = words[currentIndex].arabic;
+
+    function handleEnter(event) {
+      if (event.key === "Enter") checkAnswer();
+    }
+
+    function checkAnswer() {
+      const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
+      const correctAnswer = words[currentIndex].french.toLowerCase();
+
+      // Masquer le quiz et afficher le résultat
+      document.getElementById("quiz-container").classList.add("hidden");
+      document.getElementById("result-container").classList.remove("hidden");
+
+      if (userAnswer === correctAnswer) {
+        // Réponse correcte
+        score++;
+        document.getElementById("result-title").textContent = "Félicitations !";
+        document.getElementById("result-text").textContent = "Bonne réponse !";
+      } else {
+        // Réponse incorrecte avec explication détaillée
+        document.getElementById("result-title").textContent = "Dommage...";
+        document.getElementById("result-text").innerHTML = `
+          <strong>La bonne réponse était : ${words[currentIndex].french}</strong><br>
+          ${words[currentIndex].summary}<br>
+         `;
+      }
+    }
+
+    function nextWord() {
+      currentIndex++;
+      if (currentIndex < words.length) {
+        // Écran de chargement
+        showLoadingScreen(() => {
+          document.getElementById("arabic-word").textContent = words[currentIndex].arabic;
+          document.getElementById("answer").value = "";
+          document.getElementById("quiz-container").classList.remove("hidden");
+          document.getElementById("result-container").classList.add("hidden");
+        });
+      } else {
+        // Afficher le score final
+        document.getElementById("result-title").textContent = "Résultat Final";
+        document.getElementById("result-text").innerHTML = `
+          Votre score est de <strong>${score} / ${words.length}</strong>.
+        `;
+        document.getElementById("quiz-container").classList.add("hidden");
+        document.getElementById("loading-screen").classList.add("hidden");
+      }
+    }
+
+    function retryQuiz() {
+      // Réinitialiser le quiz
+      currentIndex = 0;
+      score = 0;
+      document.getElementById("arabic-word").textContent = words[currentIndex].arabic;
+      document.getElementById("answer").value = "";
+      document.getElementById("quiz-container").classList.remove("hidden");
+      document.getElementById("result-container").classList.add("hidden");
+    }
+
+    function showLoadingScreen(callback) {
+      document.getElementById("quiz-container").classList.add("hidden");
+      document.getElementById("result-container").classList.add("hidden");
+      document.getElementById("loading-screen").classList.remove("hidden");
+
+      setTimeout(() => {
+        document.getElementById("loading-screen").classList.add("hidden");
+        callback();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
